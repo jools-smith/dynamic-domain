@@ -6,10 +6,10 @@ import org.springframework.boot.autoconfigure.SpringBootApplication
 import org.springframework.boot.runApplication
 import org.springframework.scheduling.annotation.EnableScheduling
 import org.springframework.scheduling.annotation.Scheduled
-import revenera.gcs.dmdemo.controllers.Configuration
-import revenera.gcs.dmdemo.controllers.Scrambler
-import revenera.gcs.dmdemo.controllers.SessionManager
-import revenera.gcs.dmdemo.controllers.UserManager
+import revenera.gcs.dmdemo.model.Configuration
+import revenera.gcs.dmdemo.model.StringGenerator
+import revenera.gcs.dmdemo.model.SessionManager
+import revenera.gcs.dmdemo.model.UserManager
 
 @SpringBootApplication
 @EnableScheduling
@@ -18,7 +18,7 @@ class DmDemoApplication (
     private val sessionManager: SessionManager,
     private val userManager: UserManager,
     private val configuration: Configuration,
-    private val scrambler: Scrambler) {
+    private val stringGenerator: StringGenerator) {
 
     @PostConstruct
     fun init() {

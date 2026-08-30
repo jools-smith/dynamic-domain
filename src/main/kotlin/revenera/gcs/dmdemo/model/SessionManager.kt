@@ -1,35 +1,38 @@
-package revenera.gcs.dmdemo.controllers
+package revenera.gcs.dmdemo.model
 
 import jakarta.annotation.PostConstruct
 import jakarta.annotation.PreDestroy
 import kotlinx.serialization.json.Json
 import org.springframework.stereotype.Service
+import revenera.gcs.dmdemo.controllers.Lockable
+import revenera.gcs.dmdemo.controllers.ReentrantLockingPolicy
 import java.util.concurrent.ConcurrentHashMap
-import kotlin.time.Clock
+
 
 @Service
 class SessionManager(
-    private val scrambler: Scrambler,
-    private val configuration: Configuration) {
+    private val stringGenerator: StringGenerator,
+    private val configuration: Configuration
+) : Lockable(ReentrantLockingPolicy()) {
 
     private final val sessions = ConcurrentHashMap<String, Session>()
 
     companion object {
-        val json = Json {
+        private val json = Json {
             ignoreUnknownKeys = true
             prettyPrint = true
             encodeDefaults = true
         }
-        val filename = "sessions.json"
+        private const val FILENAME = "sessions.json"
     }
 
     @PostConstruct
-    fun init() {
+    fun init() = locked {
 
-        val file = configuration.getFile(filename)
+        val file = configuration.getFile(FILENAME)
 
         if (file.exists()) {
-            val txt = configuration.getFile(filename).readText()
+            val txt = configuration.getFile(FILENAME).readText()
 
             val savedSessions = json.decodeFromString<Map<String, Session>>(txt)
 
@@ -40,36 +43,35 @@ class SessionManager(
     }
 
     @PreDestroy
-    fun cleanup() {
+    fun cleanup() = locked {
 
-        configuration.getFile(filename).writeText(
+        configuration.getFile(FILENAME).writeText(
             json.encodeToString(sessions.toMap())
         )
 
         println("SessionManager being destroyed")
     }
 
-    fun createSession(userid: String): String {
+    fun createSession(userid: String): String = locked {
         val session = Session(
-            scrambler.generateBase34Token(32),
+            stringGenerator.generateBase34Token(32),
             userId = userid
         )
 
         sessions[session.id] = session
 
-        return session.id
+        session.id
     }
 
-    fun getSessions(): Collection<Session> {
-        return sessions.values
+    fun getSessions(): Collection<Session> = locked {
+        sessions.values
     }
 
-    fun getSession(sessionId: String): Session? {
-        return sessions[sessionId]
+    fun getSession(sessionId: String): Session? = locked {
+        sessions[sessionId]
     }
 
-    fun removeExpiredSessions() {
-        val now = Clock.System.now().toEpochMilliseconds()
+    fun removeExpiredSessions() = locked {
 
         sessions.entries.removeIf { (_, session) ->
             val expired = session.timeRemaining.isNegative()

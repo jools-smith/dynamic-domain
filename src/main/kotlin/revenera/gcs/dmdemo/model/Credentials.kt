@@ -1,4 +1,4 @@
-package revenera.gcs.dmdemo.controllers
+package revenera.gcs.dmdemo.model
 
 import kotlinx.serialization.Serializable
 
