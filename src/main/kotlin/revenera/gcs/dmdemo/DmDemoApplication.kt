@@ -16,6 +16,7 @@ import revenera.gcs.dmdemo.model.UserManager
 class DmDemoApplication (
     // beans
     private val sessionManager: SessionManager,
+    // these are here for future use and clarity on what the singleton beans are
     private val userManager: UserManager,
     private val configuration: Configuration,
     private val stringGenerator: StringGenerator) {

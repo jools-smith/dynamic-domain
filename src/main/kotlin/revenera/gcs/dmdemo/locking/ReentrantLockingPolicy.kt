@@ -1,4 +1,4 @@
-package revenera.gcs.dmdemo.controllers
+package revenera.gcs.dmdemo.locking
 
 import java.util.concurrent.locks.ReentrantLock
 import kotlin.concurrent.withLock

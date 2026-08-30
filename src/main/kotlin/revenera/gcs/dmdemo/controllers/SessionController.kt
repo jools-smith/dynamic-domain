@@ -1,11 +1,16 @@
-package revenera.gcs.dmdemo.model
+package revenera.gcs.dmdemo.controllers
 
 import jakarta.servlet.http.HttpServletRequest
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
-import revenera.gcs.dmdemo.SessionFault
-import revenera.gcs.dmdemo.UserNotAuthenticatedFault
+import revenera.gcs.dmdemo.model.Configuration
+import revenera.gcs.dmdemo.model.Credentials
+import revenera.gcs.dmdemo.model.Session
+import revenera.gcs.dmdemo.model.SessionFault
+import revenera.gcs.dmdemo.model.SessionManager
+import revenera.gcs.dmdemo.model.UserManager
+import revenera.gcs.dmdemo.model.UserNotAuthenticatedFault
 
 
 @RestController("sessionController", )
@@ -15,6 +20,14 @@ class SessionController(
     private val userManager: UserManager,
     private val configuration: Configuration) {
 
+    private fun <T> authenticated(
+        request: HttpServletRequest,
+        action: (Session) -> T): T {
+
+        val session = validate(request)
+
+        return action(session)
+    }
 
     fun validate(request: HttpServletRequest): Session {
         val authorization = request.getHeader("Authorization")
@@ -45,18 +58,16 @@ class SessionController(
 
 
     @GetMapping("/test")
-    fun getUsers(request: HttpServletRequest) : String {
-
-        val session = validate(request)
+    fun test(request: HttpServletRequest) : String = authenticated(request) { session ->
 
         println("Session: ${session.id}")
 
-        return "OK"
+        "OK"
     }
 
     @GetMapping("/sessions")
-    fun getSessions(): Any {
-        return sessionManager.getSessions()
+    fun getSessions(request: HttpServletRequest): Any = authenticated(request) { session ->
+        sessionManager.getSessions()
     }
 
     @PostMapping("/sessions/authenticate")
@@ -67,16 +78,16 @@ class SessionController(
     }
 
     @GetMapping("/users")
-    fun getUsers(): Any {
-        return userManager.getUsers()
+    fun getUsers(request: HttpServletRequest): Any = authenticated(request) { session ->
+        userManager.getUsers()
     }
 
     @PostMapping("/users")
-    fun createUser(@RequestBody credentials: Credentials): ResponseEntity<String> {
+    fun createUser(@RequestBody credentials: Credentials,request: HttpServletRequest): ResponseEntity<String> = authenticated(request) { session ->
 
         val user = userManager.getUser(credentials.name)
 
-        return if (user != null) {
+        if (user != null) {
             ResponseEntity
                 .ok(user.id)
         }

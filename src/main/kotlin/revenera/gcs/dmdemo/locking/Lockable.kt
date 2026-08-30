@@ -1,4 +1,4 @@
-package revenera.gcs.dmdemo.controllers
+package revenera.gcs.dmdemo.locking
 
 abstract class Lockable(
     private val lockingPolicy: LockingPolicy

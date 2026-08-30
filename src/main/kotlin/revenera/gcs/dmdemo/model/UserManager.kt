@@ -4,9 +4,8 @@ import jakarta.annotation.PostConstruct
 import jakarta.annotation.PreDestroy
 import kotlinx.serialization.json.Json
 import org.springframework.stereotype.Service
-import revenera.gcs.dmdemo.UserAlreadyExistsFault
-import revenera.gcs.dmdemo.controllers.Lockable
-import revenera.gcs.dmdemo.controllers.ReentrantLockingPolicy
+import revenera.gcs.dmdemo.locking.Lockable
+import revenera.gcs.dmdemo.locking.ReentrantLockingPolicy
 import java.util.concurrent.ConcurrentHashMap
 
 @Service
