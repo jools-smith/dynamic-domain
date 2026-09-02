@@ -2,7 +2,7 @@ package revenera.gcs.domain.entities
 
 import kotlinx.serialization.Serializable
 import revenera.gcs.domain.DomainType
-import revenera.gcs.StringGenerator
+import revenera.gcs.utils.StringGenerator
 
 @Serializable
 data class User(

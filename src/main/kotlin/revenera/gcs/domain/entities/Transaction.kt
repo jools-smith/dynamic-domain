@@ -1,7 +1,7 @@
 package revenera.gcs.domain.entities
 
 import kotlinx.serialization.Serializable
-import revenera.gcs.StringGenerator
+import revenera.gcs.utils.StringGenerator
 import revenera.gcs.domain.DomainType
 
 @Serializable

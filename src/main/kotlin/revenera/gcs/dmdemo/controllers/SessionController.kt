@@ -7,8 +7,8 @@ import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
 import revenera.gcs.Configuration
-import revenera.gcs.StringGenerator
-import revenera.gcs.dmdemo.SessionFault
+import revenera.gcs.utils.StringGenerator
+import revenera.gcs.SessionFault
 import revenera.gcs.domain.DomainManager
 import revenera.gcs.domain.entities.Session
 import revenera.gcs.domain.entities.User

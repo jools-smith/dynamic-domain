@@ -1,4 +1,4 @@
-package revenera.gcs
+package revenera.gcs.utils
 
 import jakarta.annotation.PostConstruct
 import jakarta.annotation.PreDestroy

@@ -8,6 +8,7 @@ import org.springframework.scheduling.annotation.EnableScheduling
 import org.springframework.scheduling.annotation.Scheduled
 import revenera.gcs.domain.DomainManager
 import revenera.gcs.domain.entities.User
+import revenera.gcs.utils.StringGenerator
 
 @SpringBootApplication
 @EnableScheduling
@@ -15,7 +16,8 @@ class DmDemoApplication (
     // beans
     private val domainManager: DomainManager,
     private val configuration: Configuration,
-    private val stringGenerator: StringGenerator) {
+    private val stringGenerator: StringGenerator
+) {
 
     @PostConstruct
     fun init() {

@@ -1,4 +1,4 @@
-package revenera.gcs.dmdemo
+package revenera.gcs
 
 import org.springframework.http.HttpStatus
 import org.springframework.http.ProblemDetail
@@ -17,18 +17,6 @@ open class UserFault (
     reason: String,
 ) : RuntimeException(
     "User '$username' '$reason'")
-
-class UserAlreadyExistsFault (
-    username: String
-) : UserFault(username, HttpStatus.CONFLICT, reason = "already exists")
-
-class UserNotFoundFault (
-    username: String
-) : UserFault(username, HttpStatus.NOT_FOUND, reason = "does not exist")
-
-class UserNotAuthenticatedFault (
-    username: String
-) : UserFault(username, HttpStatus.UNAUTHORIZED, reason = "authentication failed")
 
 @RestControllerAdvice
 class ErrorHandler {

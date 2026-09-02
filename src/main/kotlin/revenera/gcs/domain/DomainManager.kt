@@ -5,9 +5,9 @@ import jakarta.annotation.PreDestroy
 import kotlinx.serialization.json.Json
 import org.springframework.stereotype.Service
 import revenera.gcs.Configuration
-import revenera.gcs.StringGenerator
-import revenera.gcs.dmdemo.UserNotAuthenticatedFault
-import revenera.gcs.dmdemo.UserNotFoundFault
+import revenera.gcs.utils.StringGenerator
+import revenera.gcs.faults.UserNotAuthenticatedFault
+import revenera.gcs.faults.UserNotFoundFault
 import revenera.gcs.dmdemo.controllers.Credentials
 import revenera.gcs.domain.entities.User
 import revenera.gcs.domain.entities.DomainObject
