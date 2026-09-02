@@ -5,49 +5,35 @@ import jakarta.annotation.PreDestroy
 import kotlinx.serialization.json.Json
 import org.springframework.stereotype.Service
 import revenera.gcs.Configuration
-import revenera.gcs.utils.StringGenerator
+import revenera.gcs.dmdemo.controllers.Credentials
+import revenera.gcs.domain.entities.IEntity
+import revenera.gcs.domain.entities.Session
+import revenera.gcs.domain.entities.User
 import revenera.gcs.faults.UserNotAuthenticatedFault
 import revenera.gcs.faults.UserNotFoundFault
-import revenera.gcs.dmdemo.controllers.Credentials
-import revenera.gcs.domain.entities.User
-import revenera.gcs.domain.entities.DomainObject
-import revenera.gcs.domain.entities.Session
 import revenera.gcs.locking.Lockable
 import revenera.gcs.locking.ReentrantLockingPolicy
+import revenera.gcs.utils.StringGenerator
 import java.util.concurrent.ConcurrentHashMap
-
-interface IUserManagement {
-    fun getUsers() : Collection<User>
-
-    fun locateUser(username: String) : User?
-
-    fun locateUser(credentials: Credentials) : User?
-
-    fun validateCredentials(credentials: Credentials) : User
-}
-
-interface ISessionManagement {
-    fun getSessions() : Collection<Session>
-
-    fun locateSession(sid: String) : Session?
-}
-
-interface IEntityManagement {
-    fun injectEntity(entity: DomainObject) : DomainObject
-
-    fun removeEntity(entity: DomainObject) : DomainObject?
-}
 
 @Service
 class DomainManager(
     private val generator : StringGenerator,
 
-    private val configuration: Configuration,
-
-    private val filename: String = "cache.json") :
+    private val configuration: Configuration) :
         Lockable(ReentrantLockingPolicy()), IUserManagement, ISessionManagement, IEntityManagement {
 
-    final val cache = ConcurrentHashMap<String, DomainObject>()
+    private final val cache = ConcurrentHashMap<String, IEntity>()
+
+    val userManager: IUserManagement
+        get() = this
+
+    val sessionManager: ISessionManagement
+        get() = this
+
+    val entityManager: IEntityManagement
+        get() = this
+
 
     companion object {
         private val json = Json {
@@ -55,12 +41,14 @@ class DomainManager(
             prettyPrint = true
             encodeDefaults = true
         }
+
+        private const val FILENAME: String = "cache.json"
     }
 
     @PostConstruct
     fun init() = locked {
 
-        val file = configuration.getFile(filename)
+        val file = configuration.getFile(FILENAME)
 
         if (file.exists()) {
             val txt = file.readText()
@@ -68,7 +56,7 @@ class DomainManager(
             val objects = json.decodeFromString<DomainSnapshot>(txt)
 
             objects.credentials.forEach { credentials -> cache[credentials.id] = credentials }
-            objects.sessions.forEach { session -> cache[session.userId] = session }
+            objects.sessions.forEach { session -> cache[session.id] = session }
         }
 
         println("DomainManager initialized")
@@ -77,7 +65,7 @@ class DomainManager(
     @PreDestroy
     fun cleanup() = locked {
 
-        configuration.getFile(filename).writeText(
+        configuration.getFile(FILENAME).writeText(
             json.encodeToString(DomainSnapshot(
                 cache.values.filterIsInstance<User>(),
                 cache.values.filterIsInstance<Session>()))
@@ -88,13 +76,13 @@ class DomainManager(
 
     // IEntityManagement
 
-    override fun injectEntity(entity: DomainObject) : DomainObject = locked {
+    override fun injectEntity(entity: IEntity) : IEntity = locked {
         cache[entity.id] = entity
 
         entity
     }
 
-    override fun removeEntity(entity: DomainObject) : DomainObject? = locked {
+    override fun removeEntity(entity: IEntity) : IEntity? = locked {
         cache.remove(entity.id)
     }
 

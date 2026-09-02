@@ -8,7 +8,7 @@ import revenera.gcs.utils.StringGenerator
 data class User(
     override val id: String,
     val username: String,
-    val password: String) : DomainObject {
+    val password: String) : IEntity {
     override val type: DomainType = DomainType.USER
 
     companion object {

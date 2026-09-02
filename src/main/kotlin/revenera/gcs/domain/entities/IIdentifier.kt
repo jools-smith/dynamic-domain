@@ -3,6 +3,6 @@ package revenera.gcs.domain.entities
 import kotlinx.serialization.Serializable
 
 @Serializable
-sealed interface DomainIdentifier {
+sealed interface IIdentifier {
     val id: String
 }

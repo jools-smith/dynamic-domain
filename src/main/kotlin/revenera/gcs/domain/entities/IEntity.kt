@@ -5,6 +5,6 @@ import revenera.gcs.domain.DomainType
 
 
 @Serializable
-sealed interface DomainObject : DomainIdentifier {
+sealed interface IEntity : IIdentifier {
     val type: DomainType
 }

@@ -75,7 +75,7 @@ class SessionController(
             val sessions: Any = domainManager.getSessions()
             val admin: Any? = domainManager.locateUser("admin")
             val users: Any = domainManager.getUsers()
-            val cache: Any = domainManager.cache
+//            val cache: Any = domainManager.cache
         }
 
     @GetMapping("/sessions")

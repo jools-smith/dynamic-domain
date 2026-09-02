@@ -6,7 +6,7 @@ import revenera.gcs.domain.DomainType
 
 @Serializable
 data class Transaction(
-    override val id: String) : DomainObject {
+    override val id: String) : IEntity {
     override val type: DomainType = DomainType.TRANSACTION
 
     companion object {

@@ -15,7 +15,7 @@ data class Session(
     override val id: String,
     val userId: String,
     val start: Instant = Clock.System.now(),
-    val duration: Long) : DomainObject {
+    val duration: Long) : IEntity {
     override val type: DomainType = DomainType.SESSION
 
     companion object {
