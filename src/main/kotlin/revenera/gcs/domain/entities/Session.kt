@@ -8,6 +8,7 @@ import kotlin.time.Clock
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.hours
 import kotlin.time.Duration.Companion.milliseconds
+import kotlin.time.Duration.Companion.seconds
 import kotlin.time.Instant
 
 @Serializable
@@ -25,12 +26,12 @@ data class Session(
             duration: Duration = 1.hours): Session = Session(
                 generator.generate(),
                 credentials.id,
-                duration = duration.inWholeMilliseconds)
+                duration = duration.inWholeSeconds)
     }
 
     @get:JsonIgnore
     val expires: Instant
-        get() = start + duration.milliseconds
+        get() = start + duration.seconds
 
     @get:JsonIgnore
     val hasExpired: Boolean

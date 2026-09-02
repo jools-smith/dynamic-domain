@@ -51,6 +51,8 @@ class SessionController(
             .removePrefix("Bearer ")
             .trim()
 
+        println(token)
+
         val session = domainManager.locateSession(token)
             ?: throw SessionFault(
                 HttpStatus.UNAUTHORIZED,
@@ -73,6 +75,7 @@ class SessionController(
             val sessions: Any = domainManager.getSessions()
             val admin: Any? = domainManager.locateUser("admin")
             val users: Any = domainManager.getUsers()
+            val cache: Any = domainManager.cache
         }
 
     @GetMapping("/sessions")

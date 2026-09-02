@@ -47,7 +47,7 @@ class DomainManager(
     private val filename: String = "cache.json") :
         Lockable(ReentrantLockingPolicy()), IUserManagement, ISessionManagement, IEntityManagement {
 
-    private final val cache = ConcurrentHashMap<String, DomainObject>()
+    final val cache = ConcurrentHashMap<String, DomainObject>()
 
     companion object {
         private val json = Json {
