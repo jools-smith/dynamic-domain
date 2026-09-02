@@ -1,22 +1,35 @@
 package revenera.gcs.dmdemo.controllers
 
+import jakarta.annotation.PostConstruct
+import jakarta.annotation.PreDestroy
 import jakarta.servlet.http.HttpServletRequest
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
-import revenera.gcs.dmdemo.domain.DomainManager
-import revenera.gcs.dmdemo.model.Configuration
-import revenera.gcs.dmdemo.model.Credentials
-import revenera.gcs.dmdemo.domain.session.Session
-import revenera.gcs.dmdemo.model.SessionFault
-import revenera.gcs.dmdemo.model.UserNotAuthenticatedFault
+import revenera.gcs.Configuration
+import revenera.gcs.StringGenerator
+import revenera.gcs.dmdemo.SessionFault
+import revenera.gcs.domain.DomainManager
+import revenera.gcs.domain.entities.Session
+import revenera.gcs.domain.entities.User
 
 
 @RestController("sessionController", )
 @RequestMapping("/api")
 class SessionController(
     private val domainManager: DomainManager,
+    private val stringGenerator: StringGenerator,
     private val configuration: Configuration) {
+
+    @PostConstruct
+    fun init() {
+        println("SessionController initialized")
+    }
+
+    @PreDestroy
+    fun cleanup() {
+        println("SessionController being destroyed")
+    }
 
     private fun <T> authenticated(
         request: HttpServletRequest,
@@ -38,13 +51,13 @@ class SessionController(
             .removePrefix("Bearer ")
             .trim()
 
-        val session = sessionManager.getSession(token)
+        val session = domainManager.locateSession(token)
             ?: throw SessionFault(
                 HttpStatus.UNAUTHORIZED,
                 "Session not found"
             )
 
-        if (!session.isValid) {
+        if (session.hasExpired) {
             throw SessionFault(
                 HttpStatus.UNAUTHORIZED,
                 "Session has expired"
@@ -54,45 +67,52 @@ class SessionController(
         return session
     }
 
-
     @GetMapping("/test")
-    fun test(request: HttpServletRequest) : String = authenticated(request) { session ->
-
-        println("Session: ${session.id}")
-
-        "OK"
-    }
+    fun test(request: HttpServletRequest): Any =
+        object {
+            val sessions: Any = domainManager.getSessions()
+            val admin: Any? = domainManager.locateUser("admin")
+            val users: Any = domainManager.getUsers()
+        }
 
     @GetMapping("/sessions")
-    fun getSessions(request: HttpServletRequest): Any = authenticated(request) { session ->
-        sessionManager.getSessions()
+    fun getSessions(request: HttpServletRequest): Any = authenticated(request) {
+        domainManager.getSessions()
     }
 
     @PostMapping("/sessions/authenticate")
-    fun createSession(@RequestBody credentials: Credentials): String {
-        val user = userManager.validateUser(credentials) ?: throw UserNotAuthenticatedFault(credentials.name)
+    fun createSession(@RequestBody credentials: Credentials): ResponseEntity<String> {
 
-        return sessionManager.createSession(user.id)
+        println("{$credentials}")
+
+        val user = domainManager.validateCredentials(credentials)
+
+        val session = Session.create(stringGenerator, user)
+
+        return ResponseEntity
+            .status(HttpStatus.CREATED)
+            .body(domainManager.injectEntity(session).id)
     }
 
     @GetMapping("/users")
-    fun getUsers(request: HttpServletRequest): Any = authenticated(request) { session ->
-        userManager.getUsers()
+    fun getUsers(request: HttpServletRequest): Any = authenticated(request) {
+        domainManager.getUsers()
     }
 
     @PostMapping("/users")
-    fun createUser(@RequestBody credentials: Credentials,request: HttpServletRequest): ResponseEntity<String> = authenticated(request) { session ->
+    fun createUser(@RequestBody credentials: Credentials, request: HttpServletRequest): ResponseEntity<String> = authenticated(request) {
 
-        val user = userManager.getUser(credentials.name)
-
+        val user = domainManager.locateUser(credentials)
         if (user != null) {
-            ResponseEntity
-                .ok(user.id)
+            ResponseEntity.ok(user.id)
         }
         else {
             ResponseEntity
                 .status(HttpStatus.CREATED)
-                .body(userManager.createUser(credentials))
+                .body(domainManager.injectEntity(User.create(
+                    stringGenerator,
+                    credentials.username,
+                    credentials.password)).id)
         }
     }
 }

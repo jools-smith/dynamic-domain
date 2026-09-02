@@ -1,4 +1,4 @@
-package revenera.gcs.dmdemo
+package revenera.gcs
 
 import jakarta.annotation.PostConstruct
 import jakarta.annotation.PreDestroy
@@ -6,23 +6,23 @@ import org.springframework.boot.autoconfigure.SpringBootApplication
 import org.springframework.boot.runApplication
 import org.springframework.scheduling.annotation.EnableScheduling
 import org.springframework.scheduling.annotation.Scheduled
-import revenera.gcs.dmdemo.model.Configuration
-import revenera.gcs.dmdemo.model.StringGenerator
-import revenera.gcs.dmdemo.model.SessionManager
-import revenera.gcs.dmdemo.model.UserManager
+import revenera.gcs.domain.DomainManager
+import revenera.gcs.domain.entities.User
 
 @SpringBootApplication
 @EnableScheduling
 class DmDemoApplication (
     // beans
-    private val sessionManager: SessionManager,
-    // these are here for future use and clarity on what the singleton beans are
-    private val userManager: UserManager,
+    private val domainManager: DomainManager,
     private val configuration: Configuration,
     private val stringGenerator: StringGenerator) {
 
     @PostConstruct
     fun init() {
+        if (domainManager.getUsers().isEmpty()) {
+            domainManager.injectEntity(User.create(stringGenerator, "admin", "admin"))
+        }
+
         println("DmDemoApplication initialized")
     }
 
@@ -33,7 +33,7 @@ class DmDemoApplication (
 
     @Scheduled(cron = "0 * * * * *")
     fun runEveryMinute(){
-        sessionManager.removeExpiredSessions()
+//        sessionManager.removeExpiredSessions()
         println("Running every minute")
     }
 }

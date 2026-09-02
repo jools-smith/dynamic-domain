@@ -1,4 +1,4 @@
-package revenera.gcs.dmdemo.model
+package revenera.gcs.dmdemo
 
 import org.springframework.http.HttpStatus
 import org.springframework.http.ProblemDetail
@@ -22,7 +22,9 @@ class UserAlreadyExistsFault (
     username: String
 ) : UserFault(username, HttpStatus.CONFLICT, reason = "already exists")
 
-
+class UserNotFoundFault (
+    username: String
+) : UserFault(username, HttpStatus.NOT_FOUND, reason = "does not exist")
 
 class UserNotAuthenticatedFault (
     username: String
