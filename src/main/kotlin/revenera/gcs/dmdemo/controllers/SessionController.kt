@@ -4,20 +4,18 @@ import jakarta.servlet.http.HttpServletRequest
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
+import revenera.gcs.dmdemo.domain.DomainManager
 import revenera.gcs.dmdemo.model.Configuration
 import revenera.gcs.dmdemo.model.Credentials
-import revenera.gcs.dmdemo.model.Session
+import revenera.gcs.dmdemo.domain.session.Session
 import revenera.gcs.dmdemo.model.SessionFault
-import revenera.gcs.dmdemo.model.SessionManager
-import revenera.gcs.dmdemo.model.UserManager
 import revenera.gcs.dmdemo.model.UserNotAuthenticatedFault
 
 
 @RestController("sessionController", )
 @RequestMapping("/api")
 class SessionController(
-    private val sessionManager: SessionManager,
-    private val userManager: UserManager,
+    private val domainManager: DomainManager,
     private val configuration: Configuration) {
 
     private fun <T> authenticated(
