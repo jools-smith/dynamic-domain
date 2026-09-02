@@ -16,15 +16,13 @@ class DmDemoApplication (
     // beans
     private val domainManager: DomainManager,
     private val configuration: Configuration,
-    private val stringGenerator: StringGenerator
-) {
+    private val stringGenerator: StringGenerator) {
 
     @PostConstruct
     fun init() {
         if (domainManager.getUsers().isEmpty()) {
             domainManager.injectEntity(User.create(stringGenerator, "admin", "admin"))
         }
-
         println("DmDemoApplication initialized")
     }
 

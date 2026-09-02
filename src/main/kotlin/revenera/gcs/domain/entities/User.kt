@@ -3,12 +3,14 @@ package revenera.gcs.domain.entities
 import kotlinx.serialization.Serializable
 import revenera.gcs.domain.DomainType
 import revenera.gcs.utils.StringGenerator
+import revenera.gcs.utils.md5
 
 @Serializable
 data class User(
     override val id: String,
     val username: String,
-    val password: String) : IEntity {
+    val password: String,
+    val hash: String) : IEntity {
     override val type: DomainType = DomainType.USER
 
     companion object {
@@ -18,7 +20,8 @@ data class User(
             password: String) = User(
             generator.generate(),
             username,
-            password
+            password,
+                password.md5()
         )
     }
 }

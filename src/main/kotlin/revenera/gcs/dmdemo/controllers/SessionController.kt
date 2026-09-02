@@ -51,7 +51,7 @@ class SessionController(
             .removePrefix("Bearer ")
             .trim()
 
-        println(token)
+//        println(token)
 
         val session = domainManager.locateSession(token)
             ?: throw SessionFault(
@@ -86,7 +86,7 @@ class SessionController(
     @PostMapping("/sessions/authenticate")
     fun createSession(@RequestBody credentials: Credentials): ResponseEntity<String> {
 
-        println("{$credentials}")
+//        println("{$credentials}")
 
         val user = domainManager.validateCredentials(credentials)
 
