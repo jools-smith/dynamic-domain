@@ -19,7 +19,6 @@ import java.util.concurrent.ConcurrentHashMap
 @Service
 class DomainManager(
     private val generator : StringGenerator,
-
     private val configuration: Configuration) :
         Lockable(ReentrantLockingPolicy()), IUserManagement, ISessionManagement, IEntityManagement {
 
@@ -59,7 +58,7 @@ class DomainManager(
             objects.sessions.forEach { session -> cache[session.id] = session }
         }
 
-        println("DomainManager initialized")
+        logger.info("initialized")
     }
 
     @PreDestroy
@@ -71,7 +70,7 @@ class DomainManager(
                 cache.values.filterIsInstance<Session>()))
         )
 
-        println("SessionManager being destroyed")
+        logger.info("destroyed")
     }
 
     // IEntityManagement
@@ -94,6 +93,10 @@ class DomainManager(
 
     override fun locateSession(sid: String) : Session? = locked {
         cache[sid] as Session?
+    }
+
+    override fun housekeeping() {
+        TODO("Not yet implemented")
     }
 
     // IUserManager

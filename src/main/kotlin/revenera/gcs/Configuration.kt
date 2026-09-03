@@ -1,14 +1,16 @@
 package revenera.gcs
 
 import jakarta.annotation.PostConstruct
+import jakarta.annotation.PreDestroy
 import org.springframework.stereotype.Service
+import revenera.gcs.utils.Loggable
 import java.io.File
 import java.nio.file.Path
 import java.nio.file.Paths
 
 @Service
 data class Configuration(
-    val root : String = "c:\\working\\kotlin\\dm-demo\\storage") {
+    val root : String = "c:\\working\\kotlin\\dm-demo\\storage") : Loggable() {
 
     fun getFilePath(vararg elements: String) : Path {
         return Paths.get(root, *elements).toAbsolutePath()
@@ -23,6 +25,11 @@ data class Configuration(
 
         File(root).mkdir()
 
-        println("Configuration initialized")
+        logger.info("initialized")
+    }
+
+    @PreDestroy
+    fun cleanup() {
+        logger.info("destroyed")
     }
 }

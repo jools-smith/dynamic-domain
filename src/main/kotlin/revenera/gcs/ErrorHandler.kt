@@ -28,4 +28,9 @@ class ErrorHandler {
     @ExceptionHandler(SessionFault::class)
     fun handle(ex: SessionFault): ProblemDetail =
         ProblemDetail.forStatusAndDetail(ex.status,ex.message)
+
+
+    @ExceptionHandler(NotImplementedError::class)
+    fun handle(ex: NotImplementedError): ProblemDetail =
+        ProblemDetail.forStatusAndDetail(HttpStatus.INTERNAL_SERVER_ERROR,ex.message)
 }

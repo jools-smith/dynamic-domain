@@ -8,18 +8,18 @@ import java.security.SecureRandom
 @Service
 class StringGenerator(
     val charset:String = StringGenerator.bas56(),
-    val length:Int = 32) {
+    val length:Int = 32) : Loggable() {
 
     private val rand = SecureRandom()
 
     @PostConstruct
     fun init() {
-        println("SimpleGenerator initialized")
+        logger.info("initialized")
     }
 
     @PreDestroy
     fun cleanup() {
-        println("SimpleGenerator being destroyed")
+        logger.info("destroyed")
     }
 
     companion object {

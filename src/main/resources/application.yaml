@@ -1,17 +1,36 @@
 spring:
   application:
-    name: dm-demo
+    name: dynamo
+  jackson:
+    default-property-inclusion: non_null
+    serialization:
+
+    deserialization:
+      fail-on-unknown-properties: false
+
 
 management:
   endpoint:
     shutdown:
       access: unrestricted
-
+    health:
+      show-details: always
   endpoints:
     web:
       exposure:
         include: "*"
 
-  server:
-    error:
-      include-message: always
+
+server:
+  port: 8080
+  shutdown: graceful
+  error:
+    include-message: always
+    include-binding-errors: always
+    include-stacktrace: never
+
+logging:
+  level:
+    root: INFO
+    org.gcs: DEBUG
+    org.springframework.web: INFO

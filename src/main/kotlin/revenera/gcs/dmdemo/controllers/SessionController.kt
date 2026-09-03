@@ -12,6 +12,7 @@ import revenera.gcs.SessionFault
 import revenera.gcs.domain.DomainManager
 import revenera.gcs.domain.entities.Session
 import revenera.gcs.domain.entities.User
+import revenera.gcs.utils.Loggable
 
 
 @RestController("sessionController", )
@@ -19,16 +20,16 @@ import revenera.gcs.domain.entities.User
 class SessionController(
     private val domainManager: DomainManager,
     private val stringGenerator: StringGenerator,
-    private val configuration: Configuration) {
+    private val configuration: Configuration) : Loggable() {
 
     @PostConstruct
     fun init() {
-        println("SessionController initialized")
+        logger.info("initialized")
     }
 
     @PreDestroy
     fun cleanup() {
-        println("SessionController being destroyed")
+        logger.info("destroyed")
     }
 
     private fun <T> authenticated(
@@ -119,3 +120,4 @@ class SessionController(
         }
     }
 }
+
