@@ -6,6 +6,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication
 import org.springframework.boot.runApplication
 import org.springframework.scheduling.annotation.EnableScheduling
 import org.springframework.scheduling.annotation.Scheduled
+import revenera.gcs.dmdemo.controllers.Credentials
 import revenera.gcs.domain.DomainManager
 import revenera.gcs.domain.entities.User
 import revenera.gcs.utils.Loggable
@@ -21,9 +22,22 @@ class DmDemoApplication (
 
     @PostConstruct
     fun init() {
-        if (domainManager.getUsers().isEmpty()) {
-            domainManager.injectEntity(User.create(stringGenerator, "admin", "admin"))
+        val credentials = Credentials("admin", "admin")
+
+        val user = domainManager.locateUser(credentials)
+        if (user == null) {
+            domainManager.injectEntity(
+                User.create(
+                    stringGenerator,
+                    credentials.username,
+                    credentials.password))
+
+            logger.debug("created {}", domainManager.locateUser(credentials))
         }
+        else {
+            logger.debug("located {}", user)
+        }
+
         logger.info("initialized")
     }
 
@@ -32,8 +46,8 @@ class DmDemoApplication (
         logger.info("destroyed")
     }
 
-    @Scheduled(cron = "0 * * * * *")
-    fun runEveryMinute(){
+    @Scheduled(cron = "\${app.housekeeping.cron}")
+    fun housekeeping(){
         domainManager.housekeeping()
 
         logger.info("Running every minute")

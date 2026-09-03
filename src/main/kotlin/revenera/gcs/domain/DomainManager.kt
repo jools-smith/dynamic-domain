@@ -22,6 +22,7 @@ class DomainManager(
     private val configuration: Configuration) :
         Lockable(ReentrantLockingPolicy()), IUserManagement, ISessionManagement, IEntityManagement {
 
+    //TODO: encapsulate cache against IEntityManagement
     private final val cache = ConcurrentHashMap<String, IEntity>()
 
     val userManager: IUserManagement
@@ -33,7 +34,6 @@ class DomainManager(
     val entityManager: IEntityManagement
         get() = this
 
-
     companion object {
         private val json = Json {
             ignoreUnknownKeys = true
@@ -44,9 +44,7 @@ class DomainManager(
         private const val FILENAME: String = "cache.json"
     }
 
-    @PostConstruct
-    fun init() = locked {
-
+    private fun cacheLoad(): Boolean {
         val file = configuration.getFile(FILENAME)
 
         if (file.exists()) {
@@ -56,21 +54,40 @@ class DomainManager(
 
             objects.credentials.forEach { credentials -> cache[credentials.id] = credentials }
             objects.sessions.forEach { session -> cache[session.id] = session }
+
+            logger.debug("cache loaded")
+            return true;
         }
+        else {
+            return false
+        }
+    }
+
+    private fun cacheSerialize() {
+        configuration.getFile(FILENAME).writeText(
+            json.encodeToString(DomainSnapshot(
+                cache.values.filterIsInstance<User>(),
+                cache.values.filterIsInstance<Session>()))
+        )
+        logger.debug("cache serialized")
+    }
+
+    @PostConstruct
+    fun init() = locked {
+        cacheLoad()
 
         logger.info("initialized")
     }
 
     @PreDestroy
     fun cleanup() = locked {
-
-        configuration.getFile(FILENAME).writeText(
-            json.encodeToString(DomainSnapshot(
-                cache.values.filterIsInstance<User>(),
-                cache.values.filterIsInstance<Session>()))
-        )
+        cacheSerialize()
 
         logger.info("destroyed")
+    }
+
+    fun housekeeping() = locked {
+        cacheSerialize()
     }
 
     // IEntityManagement
@@ -93,10 +110,6 @@ class DomainManager(
 
     override fun locateSession(sid: String) : Session? = locked {
         cache[sid] as Session?
-    }
-
-    override fun housekeeping() {
-        TODO("Not yet implemented")
     }
 
     // IUserManager

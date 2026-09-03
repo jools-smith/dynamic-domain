@@ -32,5 +32,9 @@ server:
 logging:
   level:
     root: INFO
-    org.gcs: DEBUG
+    revenera.gcs: TRACE
     org.springframework.web: INFO
+
+app:
+  housekeeping:
+    cron: "0 */1 * * * *"
