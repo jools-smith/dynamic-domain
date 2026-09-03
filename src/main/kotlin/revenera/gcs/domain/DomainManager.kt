@@ -17,6 +17,7 @@ import revenera.gcs.utils.StringGenerator
 import java.util.concurrent.ConcurrentHashMap
 
 @Service
+@Suppress("unused") //TODO:
 class DomainManager(
     private val generator : StringGenerator,
     private val configuration: Configuration) :

@@ -14,6 +14,7 @@ import revenera.gcs.utils.StringGenerator
 
 @SpringBootApplication
 @EnableScheduling
+@Suppress("unused") //TODO:
 class DmDemoApplication (
     // beans
     private val domainManager: DomainManager,
@@ -46,7 +47,7 @@ class DmDemoApplication (
         logger.info("destroyed")
     }
 
-    @Scheduled(cron = "\${app.housekeeping.cron}")
+    @Scheduled(cron = $$"${app.housekeeping.cron}")
     fun housekeeping(){
         domainManager.housekeeping()
 

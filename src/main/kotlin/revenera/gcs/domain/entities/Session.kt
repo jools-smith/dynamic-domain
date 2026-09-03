@@ -11,6 +11,7 @@ import kotlin.time.Duration.Companion.seconds
 import kotlin.time.Instant
 
 @Serializable
+@Suppress("unused") //TODO:
 data class Session(
     override val id: String,
     val userId: String,

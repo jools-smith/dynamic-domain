@@ -4,6 +4,7 @@ import org.springframework.http.HttpStatus
 import org.springframework.http.ProblemDetail
 import org.springframework.web.bind.annotation.ExceptionHandler
 import org.springframework.web.bind.annotation.RestControllerAdvice
+import java.security.SecureRandom
 
 open class SessionFault (
     val status: HttpStatus,
@@ -18,6 +19,7 @@ open class UserFault (
 ) : RuntimeException(
     "User '$username' '$reason'")
 
+@Suppress("unused") //TODO:
 @RestControllerAdvice
 class ErrorHandler {
 

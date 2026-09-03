@@ -6,11 +6,10 @@ import org.springframework.stereotype.Service
 import java.security.SecureRandom
 
 @Service
+@Suppress("unused") //TODO:
 class StringGenerator(
-    val charset:String = StringGenerator.bas56(),
+    val charset:String = bas56(),
     val length:Int = 32) : Loggable() {
-
-    private val rand = SecureRandom()
 
     @PostConstruct
     fun init() {
@@ -23,6 +22,8 @@ class StringGenerator(
     }
 
     companion object {
+        private val rand = SecureRandom()
+
         private const val ALPHA = "abcdefghijklmnopqrstuvwxyz"
         private const val DIGITS = "0123456789"
 

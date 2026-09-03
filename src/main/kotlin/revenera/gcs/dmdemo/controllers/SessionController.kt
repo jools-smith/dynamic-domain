@@ -17,6 +17,7 @@ import revenera.gcs.utils.Loggable
 
 @RestController("sessionController", )
 @RequestMapping("/api")
+@Suppress("unused") //TODO:
 class SessionController(
     private val domainManager: DomainManager,
     private val stringGenerator: StringGenerator,
