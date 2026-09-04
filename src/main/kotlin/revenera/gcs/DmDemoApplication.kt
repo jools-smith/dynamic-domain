@@ -7,8 +7,8 @@ import org.springframework.boot.runApplication
 import org.springframework.scheduling.annotation.EnableScheduling
 import org.springframework.scheduling.annotation.Scheduled
 import revenera.gcs.dmdemo.controllers.Credentials
+import revenera.gcs.domain.Entity
 import revenera.gcs.domain.Manager
-import revenera.gcs.domain.User
 import revenera.gcs.utils.Loggable
 import revenera.gcs.utils.StringGenerator
 
@@ -28,7 +28,7 @@ class DmDemoApplication (
         val user = manager.locateUser(credentials)
         if (user == null) {
             manager.injectEntity(
-                User.create(
+                Entity.User.create(
                     stringGenerator,
                     credentials.username,
                     credentials.password))

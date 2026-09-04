@@ -9,9 +9,8 @@ import org.springframework.web.bind.annotation.*
 import revenera.gcs.Configuration
 import revenera.gcs.utils.StringGenerator
 import revenera.gcs.SessionFault
+import revenera.gcs.domain.Entity
 import revenera.gcs.domain.Manager
-import revenera.gcs.domain.Session
-import revenera.gcs.domain.User
 import revenera.gcs.utils.Loggable
 
 
@@ -35,14 +34,14 @@ class SessionController(
 
     private fun <T> authenticated(
         request: HttpServletRequest,
-        action: (Session) -> T): T {
+        action: (Entity.Session) -> T): T {
 
         val session = validate(request)
 
         return action(session)
     }
 
-    fun validate(request: HttpServletRequest): Session {
+    fun validate(request: HttpServletRequest): Entity.Session {
         val authorization = request.getHeader("Authorization")
             ?: throw SessionFault(
                 HttpStatus.UNAUTHORIZED,
@@ -87,7 +86,7 @@ class SessionController(
 
         val user = manager.validateCredentials(credentials)
 
-        val session = Session.create(stringGenerator, user)
+        val session = Entity.Session.create(stringGenerator, user)
 
         return ResponseEntity
             .status(HttpStatus.CREATED)
@@ -109,7 +108,7 @@ class SessionController(
         else {
             ResponseEntity
                 .status(HttpStatus.CREATED)
-                .body(manager.injectEntity(User.create(
+                .body(manager.injectEntity(Entity.User.create(
                     stringGenerator,
                     credentials.username,
                     credentials.password)).id)

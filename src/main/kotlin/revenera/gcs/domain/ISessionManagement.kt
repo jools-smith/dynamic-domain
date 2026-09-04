@@ -1,7 +1,7 @@
 package revenera.gcs.domain
 
 interface ISessionManagement {
-    fun getSessions() : Collection<Session>
+    fun getSessions() : Collection<Entity.Session>
 
-    fun locateSession(sid: String) : Session?
+    fun locateSession(sid: String) : Entity.Session?
 }

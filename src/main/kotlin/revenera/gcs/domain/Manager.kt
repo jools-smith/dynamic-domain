@@ -24,8 +24,8 @@ class Manager(
     /** used for serialization only */
     @Serializable
     private data class Snapshot(
-        val credentials: List<User>,
-        val sessions: List<Session>,
+        val credentials: List<Entity.User>,
+        val sessions: List<Entity.Session>,
     )
 
     //TODO: encapsulate cache against IEntityManagement
@@ -72,8 +72,8 @@ class Manager(
     private fun cacheSerialize() {
         configuration.getFile(FILENAME).writeText(
             json.encodeToString(Snapshot(
-                cache.values.filterIsInstance<User>(),
-                cache.values.filterIsInstance<Session>()))
+                cache.values.filterIsInstance<Entity.User>(),
+                cache.values.filterIsInstance<Entity.Session>()))
         )
         logger.debug("cache serialized")
     }
@@ -110,29 +110,29 @@ class Manager(
 
     // ISessionManagement
 
-    override fun getSessions() : Collection<Session> = locked {
-        cache.values.filterIsInstance<Session>()
+    override fun getSessions() : Collection<Entity.Session> = locked {
+        cache.values.filterIsInstance<Entity.Session>()
     }
 
-    override fun locateSession(sid: String) : Session? = locked {
-        cache[sid] as Session?
+    override fun locateSession(sid: String) : Entity.Session? = locked {
+        cache[sid] as Entity.Session?
     }
 
     // IUserManager
-    override fun getUsers() : Collection<User> = locked {
-        cache.values.filterIsInstance<User>()
+    override fun getUsers() : Collection<Entity.User> = locked {
+        cache.values.filterIsInstance<Entity.User>()
     }
 
-    override fun locateUser(username: String) : User? = locked {
+    override fun locateUser(username: String) : Entity.User? = locked {
         getUsers().find { user ->
             user.username == username
         }
     }
 
-    override fun locateUser(credentials: Credentials) : User? =
+    override fun locateUser(credentials: Credentials) : Entity.User? =
         locateUser(credentials.username)
 
-    override fun validateCredentials(credentials: Credentials) : User = locked {
+    override fun validateCredentials(credentials: Credentials) : Entity.User = locked {
         val user = locateUser(credentials) ?: throw UserNotFoundFault(credentials.username)
 
         if (user.password != credentials.password) {
