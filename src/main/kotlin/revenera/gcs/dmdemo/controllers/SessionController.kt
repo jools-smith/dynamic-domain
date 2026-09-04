@@ -9,9 +9,9 @@ import org.springframework.web.bind.annotation.*
 import revenera.gcs.Configuration
 import revenera.gcs.utils.StringGenerator
 import revenera.gcs.SessionFault
-import revenera.gcs.domain.DomainManager
-import revenera.gcs.domain.entities.Session
-import revenera.gcs.domain.entities.User
+import revenera.gcs.domain.Manager
+import revenera.gcs.domain.Session
+import revenera.gcs.domain.User
 import revenera.gcs.utils.Loggable
 
 
@@ -19,7 +19,7 @@ import revenera.gcs.utils.Loggable
 @RequestMapping("/api")
 @Suppress("unused") //TODO:
 class SessionController(
-    private val domainManager: DomainManager,
+    private val manager: Manager,
     private val stringGenerator: StringGenerator,
     private val configuration: Configuration) : Loggable() {
 
@@ -53,9 +53,7 @@ class SessionController(
             .removePrefix("Bearer ")
             .trim()
 
-//        println(token)
-
-        val session = domainManager.locateSession(token)
+        val session = manager.locateSession(token)
             ?: throw SessionFault(
                 HttpStatus.UNAUTHORIZED,
                 "Session not found"
@@ -74,51 +72,51 @@ class SessionController(
     @GetMapping("/test")
     fun test(request: HttpServletRequest): Any =
         object {
-            val sessions: Any = domainManager.getSessions()
-            val admin: Any? = domainManager.locateUser("admin")
-            val users: Any = domainManager.getUsers()
-//            val cache: Any = domainManager.cache
+            val sessions: Any = manager.getSessions()
+            val admin: Any? = manager.locateUser("admin")
+            val users: Any = manager.getUsers()
         }
 
     @GetMapping("/sessions")
     fun getSessions(request: HttpServletRequest): Any = authenticated(request) {
-        domainManager.getSessions()
+        manager.getSessions()
     }
 
     @PostMapping("/sessions/authenticate")
     fun createSession(@RequestBody credentials: Credentials): ResponseEntity<String> {
 
-//        println("{$credentials}")
-
-        val user = domainManager.validateCredentials(credentials)
+        val user = manager.validateCredentials(credentials)
 
         val session = Session.create(stringGenerator, user)
 
         return ResponseEntity
             .status(HttpStatus.CREATED)
-            .body(domainManager.injectEntity(session).id)
+            .body(manager.injectEntity(session).id)
     }
 
     @GetMapping("/users")
     fun getUsers(request: HttpServletRequest): Any = authenticated(request) {
-        domainManager.getUsers()
+        manager.getUsers()
     }
 
     @PostMapping("/users")
     fun createUser(@RequestBody credentials: Credentials, request: HttpServletRequest): ResponseEntity<String> = authenticated(request) {
 
-        val user = domainManager.locateUser(credentials)
+        val user = manager.locateUser(credentials)
         if (user != null) {
             ResponseEntity.ok(user.id)
         }
         else {
             ResponseEntity
                 .status(HttpStatus.CREATED)
-                .body(domainManager.injectEntity(User.create(
+                .body(manager.injectEntity(User.create(
                     stringGenerator,
                     credentials.username,
                     credentials.password)).id)
         }
     }
+
+//    @GetMapping("/session/consume")
+//    fun createUser(@RequestBody data: Any, request: HttpServletRequest): ResponseEntity<String> = authenticated(request) {
 }
 

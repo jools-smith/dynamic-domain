@@ -4,7 +4,7 @@ import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
 @Serializable
-enum class DomainType {
+enum class Type {
     @SerialName("SX")
     SESSION,
 

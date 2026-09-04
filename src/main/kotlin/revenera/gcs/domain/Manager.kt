@@ -2,13 +2,11 @@ package revenera.gcs.domain
 
 import jakarta.annotation.PostConstruct
 import jakarta.annotation.PreDestroy
+import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.Json
 import org.springframework.stereotype.Service
 import revenera.gcs.Configuration
 import revenera.gcs.dmdemo.controllers.Credentials
-import revenera.gcs.domain.entities.IEntity
-import revenera.gcs.domain.entities.Session
-import revenera.gcs.domain.entities.User
 import revenera.gcs.faults.UserNotAuthenticatedFault
 import revenera.gcs.faults.UserNotFoundFault
 import revenera.gcs.locking.Lockable
@@ -18,13 +16,20 @@ import java.util.concurrent.ConcurrentHashMap
 
 @Service
 @Suppress("unused") //TODO:
-class DomainManager(
+class Manager(
     private val generator : StringGenerator,
     private val configuration: Configuration) :
         Lockable(ReentrantLockingPolicy()), IUserManagement, ISessionManagement, IEntityManagement {
 
+    /** used for serialization only */
+    @Serializable
+    private data class Snapshot(
+        val credentials: List<User>,
+        val sessions: List<Session>,
+    )
+
     //TODO: encapsulate cache against IEntityManagement
-    private final val cache = ConcurrentHashMap<String, IEntity>()
+    private final val cache = ConcurrentHashMap<String, Entity>()
 
     val userManager: IUserManagement
         get() = this
@@ -51,7 +56,7 @@ class DomainManager(
         if (file.exists()) {
             val txt = file.readText()
 
-            val objects = json.decodeFromString<DomainSnapshot>(txt)
+            val objects = json.decodeFromString<Snapshot>(txt)
 
             objects.credentials.forEach { credentials -> cache[credentials.id] = credentials }
             objects.sessions.forEach { session -> cache[session.id] = session }
@@ -66,7 +71,7 @@ class DomainManager(
 
     private fun cacheSerialize() {
         configuration.getFile(FILENAME).writeText(
-            json.encodeToString(DomainSnapshot(
+            json.encodeToString(Snapshot(
                 cache.values.filterIsInstance<User>(),
                 cache.values.filterIsInstance<Session>()))
         )
@@ -93,13 +98,13 @@ class DomainManager(
 
     // IEntityManagement
 
-    override fun injectEntity(entity: IEntity) : IEntity = locked {
+    override fun injectEntity(entity: Entity) : Entity = locked {
         cache[entity.id] = entity
 
         entity
     }
 
-    override fun removeEntity(entity: IEntity) : IEntity? = locked {
+    override fun removeEntity(entity: Entity) : Entity? = locked {
         cache.remove(entity.id)
     }
 

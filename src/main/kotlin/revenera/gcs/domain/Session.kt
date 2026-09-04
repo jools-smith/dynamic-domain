@@ -1,8 +1,7 @@
-package revenera.gcs.domain.entities
+package revenera.gcs.domain
 
 import com.fasterxml.jackson.annotation.JsonIgnore
 import kotlinx.serialization.Serializable
-import revenera.gcs.domain.DomainType
 import revenera.gcs.utils.StringGenerator
 import kotlin.time.Clock
 import kotlin.time.Duration
@@ -16,8 +15,8 @@ data class Session(
     override val id: String,
     val userId: String,
     val start: Instant = Clock.System.now(),
-    val duration: Long) : IEntity {
-    override val type: DomainType = DomainType.SESSION
+    val duration: Long) : Entity {
+    override val type: Type = Type.SESSION
 
     companion object {
         fun create(

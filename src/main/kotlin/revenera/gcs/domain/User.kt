@@ -1,7 +1,6 @@
-package revenera.gcs.domain.entities
+package revenera.gcs.domain
 
 import kotlinx.serialization.Serializable
-import revenera.gcs.domain.DomainType
 import revenera.gcs.utils.StringGenerator
 import revenera.gcs.utils.md5
 
@@ -10,8 +9,8 @@ data class User(
     override val id: String,
     val username: String,
     val password: String,
-    val hash: String) : IEntity {
-    override val type: DomainType = DomainType.USER
+    val hash: String) : Entity {
+    override val type: Type = Type.USER
 
     companion object {
         fun create(

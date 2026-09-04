@@ -1,13 +1,12 @@
-package revenera.gcs.domain.entities
+package revenera.gcs.domain
 
 import kotlinx.serialization.Serializable
 import revenera.gcs.utils.StringGenerator
-import revenera.gcs.domain.DomainType
 
 @Serializable
 data class Transaction(
-    override val id: String) : IEntity {
-    override val type: DomainType = DomainType.TRANSACTION
+    override val id: String) : Entity {
+    override val type: Type = Type.TRANSACTION
 
     companion object {
         fun create(generator: StringGenerator): Transaction =

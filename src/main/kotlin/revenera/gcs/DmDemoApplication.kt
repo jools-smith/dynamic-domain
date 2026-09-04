@@ -7,8 +7,8 @@ import org.springframework.boot.runApplication
 import org.springframework.scheduling.annotation.EnableScheduling
 import org.springframework.scheduling.annotation.Scheduled
 import revenera.gcs.dmdemo.controllers.Credentials
-import revenera.gcs.domain.DomainManager
-import revenera.gcs.domain.entities.User
+import revenera.gcs.domain.Manager
+import revenera.gcs.domain.User
 import revenera.gcs.utils.Loggable
 import revenera.gcs.utils.StringGenerator
 
@@ -17,7 +17,7 @@ import revenera.gcs.utils.StringGenerator
 @Suppress("unused") //TODO:
 class DmDemoApplication (
     // beans
-    private val domainManager: DomainManager,
+    private val manager: Manager,
     private val configuration: Configuration,
     private val stringGenerator: StringGenerator) : Loggable() {
 
@@ -25,15 +25,15 @@ class DmDemoApplication (
     fun init() {
         val credentials = Credentials("admin", "admin")
 
-        val user = domainManager.locateUser(credentials)
+        val user = manager.locateUser(credentials)
         if (user == null) {
-            domainManager.injectEntity(
+            manager.injectEntity(
                 User.create(
                     stringGenerator,
                     credentials.username,
                     credentials.password))
 
-            logger.debug("created {}", domainManager.locateUser(credentials))
+            logger.debug("created {}", manager.locateUser(credentials))
         }
         else {
             logger.debug("located {}", user)
@@ -49,7 +49,7 @@ class DmDemoApplication (
 
     @Scheduled(cron = $$"${app.housekeeping.cron}")
     fun housekeeping(){
-        domainManager.housekeeping()
+        manager.housekeeping()
 
         logger.info("Running every minute")
     }

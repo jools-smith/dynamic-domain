@@ -1,8 +1,8 @@
-package revenera.gcs.domain.entities
+package revenera.gcs.domain
 
 import kotlinx.serialization.Serializable
 
 @Serializable
-sealed interface IIdentifier {
+sealed interface Identifier {
     val id: String
 }
